@@ -1,0 +1,7 @@
+{
+  "name": "Factory Equipment Predictive Maintenance",
+  "description": "An application to monitor factory equipment, predict failures using the Gemini API, and provide maintenance recommendations. It supports various industrial communication protocols.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
