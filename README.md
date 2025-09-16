@@ -1,59 +1,87 @@
-# Factory Insight AI - Predictive Maintenance Dashboard
 
-This is a sophisticated web application designed to monitor factory equipment in real-time. It leverages AI to provide predictive maintenance analysis, helping to prevent failures and optimize operations. The application features a modern, voice-controlled AI assistant and is highly configurable.
+# Factory Insight AI - Bảng Điều Khiển Bảo Trì Dự Đoán
 
-## Key Features
+<div align="center">
+  <img src="https://img.shields.io/badge/React-19-blue?logo=react&logoColor=white" alt="React">
+  <img src="https://img.shields.io/badge/TypeScript-5.5-blue?logo=typescript&logoColor=white" alt="TypeScript">
+  <img src="https://img.shields.io/badge/Vite-5.3-purple?logo=vite&logoColor=white" alt="Vite">
+  <img src="https://img.shields.io/badge/Electron-31-blueviolet?logo=electron&logoColor=white" alt="Electron">
+  <img src="https://img.shields.io/badge/AI-Gemini-orange?logo=google&logoColor=white" alt="Gemini">
+</div>
 
--   **Real-Time Dashboard**: Monitor key metrics (temperature, pressure, vibration) for multiple devices. Supports both a `Simulation` mode for testing and a `Live Data` mode.
--   **AI-Powered Predictive Analysis**: Uses configurable AI models (Google Gemini, OpenAI, Anthropic, and more) to analyze device data, predict potential failures, and provide actionable recommendations.
--   **Voice-Controlled AI Assistant**: Engage in a continuous, real-time voice conversation with an AI assistant to get insights and information.
--   **Device Management**: A comprehensive interface to add, edit, and delete devices and their specific communication protocol parameters.
--   **Configurable AI Providers**: A settings panel to switch between different large language models (LLMs), including Google Gemini, OpenAI, Anthropic (Claude), and a custom provider.
--   **Modern UI/UX**: Features a sleek, responsive interface with light/dark modes and a "glassmorphism" design.
--   **Notification System**: Get real-time alerts when a device's status becomes critical, with a notification panel to review recent events.
+<br>
 
-## Screenshots
+**Factory Insight AI** là một ứng dụng web tinh vi được thiết kế để giám sát thiết bị nhà máy trong thời gian thực. Nó tận dụng AI để cung cấp phân tích bảo trì dự đoán, giúp ngăn ngừa sự cố và tối ưu hóa hoạt động. Ứng dụng có một trợ lý AI hiện đại, điều khiển bằng giọng nói và có khả năng cấu hình cao.
 
-Here are a few glimpses of the application's interface.
+</div>
 
-**Main Dashboard (Dark Mode)**
-*Displays real-time data from all connected factory equipment.*
+---
 
+## ✨ Các Tính Năng Chính
 
-**AI Voice Assistant**
-*Interact with the AI using your voice for hands-free operation.*
+-   **📊 Bảng Điều Khiển Thời Gian Thực**: Giám sát các chỉ số chính (nhiệt độ, áp suất, độ rung) cho nhiều thiết bị. Hỗ trợ cả chế độ `Mô phỏng` để thử nghiệm và chế độ `Dữ liệu trực tiếp`.
+-   **🤖 Phân Tích Dự Đoán Bằng AI**: Sử dụng các mô hình AI có thể cấu hình (Google Gemini, OpenAI, Anthropic, v.v.) để phân tích dữ liệu thiết bị, dự đoán các sự cố tiềm ẩn và đưa ra các khuyến nghị có thể hành động.
+-   **🗣️ Trợ Lý AI Điều Khiển Bằng Giọng Nói**: Tương tác trong một cuộc trò chuyện thoại thời gian thực, liên tục với trợ lý AI để nhận thông tin chi tiết.
+-   **🖥️ Quản Lý Thiết Bị**: Giao diện toàn diện để thêm, chỉnh sửa và xóa các thiết bị cũng như các thông số giao thức truyền thông cụ thể của chúng.
+-   **🔧 Cấu Hình Nhà Cung Cấp AI**: Bảng cài đặt để chuyển đổi giữa các mô hình ngôn ngữ lớn (LLM) khác nhau, bao gồm Google Gemini, OpenAI, Anthropic (Claude) và nhà cung cấp tùy chỉnh.
+-   **🎨 Giao Diện/Trải Nghiệm Người Dùng Hiện Đại**: Giao diện mượt mà, đáp ứng với chế độ sáng/tối và thiết kế "glassmorphism".
+-   **🔔 Hệ Thống Thông Báo**: Nhận cảnh báo thời gian thực khi trạng thái của thiết bị trở nên nguy cấp, với bảng thông báo để xem lại các sự kiện gần đây.
 
+---
 
-**Settings Panel**
-*Easily configure and switch between different AI providers like Gemini, OpenAI, and more.*
+## 📸 Hình Ảnh Minh Họa
 
+| Bảng Điều Khiển Chính (Chế độ tối) | Trợ Lý AI Bằng Giọng Nói | Bảng Cài Đặt |
+| :---------------------------------: | :---------------------------------: | :---------------------------------: |
+| *Hiển thị dữ liệu thời gian thực từ tất cả các thiết bị nhà máy được kết nối.* | *Tương tác với AI bằng giọng nói của bạn để vận hành rảnh tay.* | *Dễ dàng cấu hình và chuyển đổi giữa các nhà cung cấp AI khác nhau.* |
+| `[Chèn ảnh chụp màn hình bảng điều khiển ở đây]` | `[Chèn ảnh chụp màn hình trợ lý giọng nói ở đây]` | `[Chèn ảnh chụp màn hình cài đặt ở đây]` |
 
-## Project Setup (For Local Development)
+---
 
-The current project files are set up for a specific web environment. To run, debug, and develop locally, you'll need to use a modern build tool like [Vite](https://vitejs.dev/). The following steps will guide you through setting up a standard local development environment.
+## 🚀 Bắt Đầu (Để Phát Triển Cục Bộ)
 
-### Prerequisites
+Dự án này được thiết lập cho một môi trường web cụ thể. Để chạy, gỡ lỗi và phát triển cục bộ, bạn sẽ cần sử dụng một công cụ xây dựng hiện đại như [Vite](https://vitejs.dev/).
 
--   [Node.js](https://nodejs.org/) (v18.x or later recommended)
--   [npm](https://www.npmjs.com/) (which comes with Node.js)
+### 📋 Điều Kiện Tiên Quyết
 
-### 1. Project Structure
+-   [Node.js](https://nodejs.org/) (khuyến nghị v18.x trở lên)
+-   [npm](https://www.npmjs.com/) (đi kèm với Node.js)
 
-First, let's organize the project files into a standard structure.
+### 🛠️ Hướng Dẫn Cài Đặt
 
-1.  Create a new folder named `src` in the root of your project.
-2.  Move the following files and folders into the new `src` folder:
-    -   `App.tsx`
-    -   `components/`
-    -   `constants.ts`
-    -   `index.tsx`
-    -   `services/`
-    -   `types.ts`
+1.  **Sắp xếp cấu trúc dự án:**
+    -   Tạo một thư mục mới có tên là `src` trong thư mục gốc của dự án.
+    -   Di chuyển các tệp và thư mục sau vào thư mục `src` mới:
+        -   `App.tsx`, `index.tsx`, `types.ts`, `constants.ts`
+        -   `components/`, `services/`
 
-### 2. Create `package.json`
+2.  **Cài đặt các gói phụ thuộc:**
+    Mở terminal của bạn trong thư mục gốc của dự án và chạy:
+    ```bash
+    npm install
+    ```
 
-In the root of your project, create a file named `package.json` and add the following content. This file defines your project's dependencies and scripts.
+3.  **Cấu hình biến môi trường:**
+    Tạo một tệp có tên là `.env` trong thư mục gốc của dự án và thêm khóa API của bạn.
+    ```env
+    # Khóa API Google Gemini của bạn
+    VITE_GEMINI_API_KEY="AIzaSy..."
+    ```
+    > **Lưu ý:** Tiền tố `VITE_` là bắt buộc để Vite hiển thị biến cho mã nguồn frontend của bạn.
 
+4.  **Chạy máy chủ phát triển:**
+    Bây giờ bạn đã sẵn sàng để chạy ứng dụng!
+    ```bash
+    npm run dev
+    ```
+    Thao tác này sẽ khởi động ứng dụng trên `http://localhost:5173`.
+
+<br>
+<details>
+<summary>📄 Xem nội dung tệp cấu hình (package.json, vite.config.ts, v.v.)</summary>
+
+#### `package.json`
+Tạo một tệp có tên `package.json` trong thư mục gốc của dự án.
 ```json
 {
   "name": "factory-insight-ai",
@@ -86,38 +114,17 @@ In the root of your project, create a file named `package.json` and add the foll
   "build": {
     "appId": "com.factory-insight.ai",
     "productName": "Factory Insight AI",
-    "files": [
-      "dist/**/*",
-      "electron.cjs"
-    ],
-    "directories": {
-      "output": "release"
-    },
-    "win": {
-      "target": "nsis"
-    },
-    "mac": {
-      "target": "dmg"
-    },
-    "linux": {
-      "target": "AppImage"
-    }
+    "files": [ "dist/**/*", "electron.cjs" ],
+    "directories": { "output": "release" },
+    "win": { "target": "nsis" },
+    "mac": { "target": "dmg" },
+    "linux": { "target": "AppImage" }
   }
 }
 ```
 
-### 3. Install Dependencies
-
-Open your terminal in the project's root directory and run:
-
-```bash
-npm install
-```
-
-### 4. Create Vite Configuration
-
-Create a file named `vite.config.ts` in the root directory. This configures the Vite server and tells it how to handle environment variables.
-
+#### `vite.config.ts`
+Tạo một tệp có tên `vite.config.ts` trong thư mục gốc.
 ```typescript
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
@@ -126,63 +133,39 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   define: {
-    // This makes VITE_GEMINI_API_KEY from your .env file
-    // available as process.env.API_KEY in your app's code.
+    // Thao tác này làm cho VITE_GEMINI_API_KEY từ tệp .env của bạn
+    // có sẵn dưới dạng process.env.API_KEY trong mã của ứng dụng.
     'process.env.API_KEY': JSON.stringify(process.env.VITE_GEMINI_API_KEY)
   }
 })
 ```
 
-### 5. Update `index.html`
-
-Modify your `index.html` file to work with Vite. Remove the `<script type="importmap">...</script>` block entirely and change the final script tag to point to the new location of `index.tsx`.
-
+#### `index.html`
+Sửa đổi tệp `index.html` của bạn để hoạt động với Vite. Xóa hoàn toàn khối `<script type="importmap">...</script>` và thay đổi thẻ script cuối cùng để trỏ đến vị trí mới của `index.tsx`.
 ```html
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    ... <!-- Keep existing head content like meta, title, links -->
+    ... <!-- Giữ lại nội dung head hiện có như meta, title, links -->
   </head>
   <body class="bg-gray-100 dark:bg-gray-900 ...">
     <div id="root"></div>
-    <script type="module" src="/src/index.tsx"></script> <!-- This line is updated -->
+    <script type="module" src="/src/index.tsx"></script> <!-- Dòng này đã được cập nhật -->
   </body>
 </html>
 ```
-
-### 6. Environment Variables
-
-The application requires API keys. Create a file named `.env` in the root of the project.
-
-**.env file example:**
-
-```env
-# Your Google Gemini API Key
-VITE_GEMINI_API_KEY="AIzaSy..."
-```
-
-*Note: The `VITE_` prefix is required by Vite to expose the variable to your frontend code.*
-
-### 7. Run the Development Server
-
-You are now ready to run the app!
-
-```bash
-npm run dev
-```
-
-This will start the application on `http://localhost:5173`.
+</details>
 
 ---
 
-## Converting to a Desktop App with Electron
+## 💻 Chuyển đổi thành Ứng dụng Desktop với Electron
 
-You can package this application as a native desktop app using Electron.
+Bạn có thể đóng gói ứng dụng này thành một ứng dụng desktop gốc bằng Electron.
 
-### 1. Create the Main Electron File
+<details>
+<summary>📄 Xem nội dung tệp electron.cjs</summary>
 
-Create a file named `electron.cjs` in the root directory. This script is the entry point for your desktop app.
-
+Tạo một tệp có tên `electron.cjs` trong thư mục gốc. Tập lệnh này là điểm vào cho ứng dụng desktop của bạn.
 ```javascript
 const { app, BrowserWindow } = require('electron');
 const path = require('path');
@@ -199,11 +182,11 @@ function createWindow() {
   });
 
   if (isDev) {
-    // In development, load from the Vite dev server
+    // Trong môi trường phát triển, tải từ máy chủ dev của Vite
     win.loadURL('http://localhost:5173');
     win.webContents.openDevTools();
   } else {
-    // In production, load the built HTML file
+    // Trong môi trường sản phẩm, tải tệp HTML đã được xây dựng
     win.loadFile(path.join(__dirname, 'dist', 'index.html'));
   }
 }
@@ -216,39 +199,27 @@ app.on('window-all-closed', () => {
   }
 });
 ```
+</details>
 
-### 2. Run in Development Mode
+### Các Lệnh Có Sẵn
 
-To run the application inside an Electron window during development, use:
+| Lệnh | Mô tả |
+| :--- | :--- |
+| `npm run dev` | Khởi động máy chủ phát triển Vite cho web. |
+| `npm run electron:dev` | Chạy ứng dụng trong một cửa sổ Electron để phát triển. |
+| `npm run build` | Xây dựng các tài sản web cho môi trường sản phẩm. |
+| `npm run electron:build` | Đóng gói ứng dụng thành một tệp thực thi (ví dụ: `.exe`, `.dmg`). |
+| `npm run preview` | Xem trước bản dựng sản phẩm một cách cục bộ. |
 
-```bash
-npm run electron:dev
-```
+<br>
 
----
-
-## Packaging as an Executable (.exe)
-
-`electron-builder` is used to package the app into a distributable format for Windows (`.exe`), macOS (`.dmg`), etc.
-
-### 1. Build the Web App
-
-First, create a production-ready build of the static web assets.
-
-```bash
-npm run build
-```
-
-This command creates a `dist` folder with the optimized frontend code.
-
-### 2. Package the Electron App
-
-Now, run the command to build the executable for your current operating system.
-
-```bash
-npm run electron:build
-```
-
-### 3. Find the Executable
-
-Once finished, you will find the installer and executable files in a new `release/` directory.
+**Để xây dựng tệp thực thi:**
+1.  **Xây dựng ứng dụng web:**
+    ```bash
+    npm run build
+    ```
+2.  **Đóng gói ứng dụng Electron:**
+    ```bash
+    npm run electron:build
+    ```
+    Tìm trình cài đặt và các tệp thực thi trong thư mục `release/` mới.
