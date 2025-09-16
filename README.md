@@ -29,15 +29,6 @@
 
 ---
 
-## 📸 Hình Ảnh Minh Họa
-
-| Bảng Điều Khiển Chính (Chế độ tối) | Trợ Lý AI Bằng Giọng Nói | Bảng Cài Đặt |
-| :---------------------------------: | :---------------------------------: | :---------------------------------: |
-| *Hiển thị dữ liệu thời gian thực từ tất cả các thiết bị nhà máy được kết nối.* | *Tương tác với AI bằng giọng nói của bạn để vận hành rảnh tay.* | *Dễ dàng cấu hình và chuyển đổi giữa các nhà cung cấp AI khác nhau.* |
-| `[Chèn ảnh chụp màn hình bảng điều khiển ở đây]` | `[Chèn ảnh chụp màn hình trợ lý giọng nói ở đây]` | `[Chèn ảnh chụp màn hình cài đặt ở đây]` |
-
----
-
 ## 🚀 Bắt Đầu (Để Phát Triển Cục Bộ)
 
 Dự án này được thiết lập cho một môi trường web cụ thể. Để chạy, gỡ lỗi và phát triển cục bộ, bạn sẽ cần sử dụng một công cụ xây dựng hiện đại như [Vite](https://vitejs.dev/).
