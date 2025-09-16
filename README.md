@@ -12,6 +12,22 @@ This is a sophisticated web application designed to monitor factory equipment in
 -   **Modern UI/UX**: Features a sleek, responsive interface with light/dark modes and a "glassmorphism" design.
 -   **Notification System**: Get real-time alerts when a device's status becomes critical, with a notification panel to review recent events.
 
+## Screenshots
+
+Here are a few glimpses of the application's interface.
+
+**Main Dashboard (Dark Mode)**
+*Displays real-time data from all connected factory equipment.*
+
+
+**AI Voice Assistant**
+*Interact with the AI using your voice for hands-free operation.*
+
+
+**Settings Panel**
+*Easily configure and switch between different AI providers like Gemini, OpenAI, and more.*
+
+
 ## Project Setup (For Local Development)
 
 The current project files are set up for a specific web environment. To run, debug, and develop locally, you'll need to use a modern build tool like [Vite](https://vitejs.dev/). The following steps will guide you through setting up a standard local development environment.
