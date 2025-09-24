@@ -219,20 +219,36 @@ const App: React.FC = () => {
     const [chatHistory, setChatHistory] = useState<ChatMessage[]>([]);
     const [isContinuousMode, setIsContinuousMode] = useState<boolean>(false);
     const [aiSettings, setAiSettings] = useState<AISettings>(() => {
+        // 1. Start with the base default settings.
+        let settings = { ...DEFAULT_AI_SETTINGS };
+
+        // 2. Try to load and merge settings from localStorage.
         try {
-            const savedSettings = localStorage.getItem('aiSettings');
-            if (savedSettings) {
-                const parsed = JSON.parse(savedSettings);
-                // Ensure the Gemini API key from env is respected if available and no key is saved
-                if (!parsed.gemini.apiKey && process.env.API_KEY) {
-                    parsed.gemini.apiKey = process.env.API_KEY;
-                }
-                return parsed;
+            const savedSettingsJSON = localStorage.getItem('aiSettings');
+            if (savedSettingsJSON) {
+                const savedSettings = JSON.parse(savedSettingsJSON);
+                // Deep merge is safer to not lose nested properties if localStorage is partial
+                settings = {
+                    ...settings,
+                    ...savedSettings,
+                    gemini: { ...settings.gemini, ...savedSettings.gemini },
+                    openai: { ...settings.openai, ...savedSettings.openai },
+                    anthropic: { ...settings.anthropic, ...savedSettings.anthropic },
+                    iotteam: { ...settings.iotteam, ...savedSettings.iotteam },
+                };
             }
         } catch (e) {
-            console.error("Failed to load AI settings from localStorage", e);
+            console.error("Failed to load or parse AI settings from localStorage", e);
+            // If parsing fails, we stick with the defaults.
         }
-        return DEFAULT_AI_SETTINGS;
+
+        // 3. IMPORTANT: Always override the Gemini API key with the environment variable if it exists.
+        // This ensures the build-time key is the source of truth.
+        if (process.env.API_KEY) {
+            settings.gemini.apiKey = process.env.API_KEY;
+        }
+        
+        return settings;
     });
 
     const [theme, setTheme] = useState<Theme>(() => {
