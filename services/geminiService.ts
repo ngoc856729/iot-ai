@@ -39,7 +39,8 @@ const analysisSchema = {
 
 async function getGeminiAnalysis(device: Device, settings: AISettings): Promise<GeminiAnalysis | null> {
     if (!settings.gemini.apiKey) throw new Error("Gemini API key is not set.");
-    const ai = new GoogleGenAI({ apiKey: settings.gemini.apiKey });
+    // Fix: Use process.env.API_KEY for Gemini initialization as per guidelines.
+    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || settings.gemini.apiKey });
     const response = await ai.models.generateContent({
         model: settings.gemini.model,
         contents: getAnalysisPrompt(device),
@@ -56,10 +57,13 @@ async function getOpenAICompatibleAnalysis(device: Device, settings: AISettings)
     const provider = settings.provider;
     const providerSettings = settings[provider];
     if (!providerSettings.apiKey) throw new Error(`${provider} API key is not set.`);
+    if (provider !== 'anthropic' && !providerSettings.baseURL) {
+        throw new Error(`${provider} Base URL is not set in settings.`);
+    }
 
     const url = provider === 'anthropic'
         ? 'https://api.anthropic.com/v1/messages'
-        : `${providerSettings.baseURL}/chat/completions`;
+        : `${providerSettings.baseURL!.replace(/\/$/, '')}/chat/completions`;
 
     const headers: Record<string, string> = {
         'Content-Type': 'application/json',
@@ -69,6 +73,7 @@ async function getOpenAICompatibleAnalysis(device: Device, settings: AISettings)
         headers['x-api-key'] = providerSettings.apiKey;
         headers['anthropic-version'] = '2023-06-01';
     } else {
+        // This logic applies to both 'openai' and 'iotteam' providers
         headers['Authorization'] = `Bearer ${providerSettings.apiKey}`;
     }
 
@@ -77,6 +82,7 @@ async function getOpenAICompatibleAnalysis(device: Device, settings: AISettings)
         max_tokens: 1024,
         messages: [{ role: 'user', content: getAnalysisPrompt(device) }],
     } : {
+        // This is the request body for OpenAI-compatible APIs (OpenAI, IoTTeam)
         model: providerSettings.model,
         messages: [{ role: 'user', content: getAnalysisPrompt(device) }],
         response_format: { type: 'json_object' },
@@ -121,24 +127,37 @@ export const getPredictiveAnalysis = async (device: Device, settings: AISettings
 
 // --- Chat Service ---
 
-const systemInstruction = {
-  role: 'system',
-  parts: [{ text: 'You are an expert AI assistant for factory maintenance and industrial operations. You are speaking with a factory floor engineer. Provide concise and helpful information.' }]
+const getSystemInstruction = (devices: Device[]) => {
+    const deviceDataContext = JSON.stringify(
+        devices.map(d => ({
+            id: d.id,
+            name: d.name,
+            protocol: d.protocol,
+            // Only include the last 50 history points to keep the context manageable
+            history: d.history,
+        }))
+    );
+
+    return {
+        role: 'system',
+        parts: [{ text: `You are an expert AI assistant for factory maintenance and industrial operations. You are speaking with a factory floor engineer. Provide concise and helpful information. You have access to the following real-time and historical device data in JSON format. Use this data to answer user questions about device performance, trends, and specific past events. The 'time' property in the history is a JavaScript timestamp (milliseconds since epoch). Current timestamp is ${Date.now()}. Device Data: ${deviceDataContext}` }]
+    };
 };
 
-export async function* streamChatResponse(history: ChatMessage[], message: string, settings: AISettings): AsyncGenerator<string> {
-    const userMessage: ChatMessage = { role: 'user', parts: [{ text: message }] };
-    const fullHistory = [...history, userMessage];
+
+// Fix: Update streamChatResponse to take the full history, avoiding duplicate message handling.
+export async function* streamChatResponse(history: ChatMessage[], settings: AISettings, devices: Device[]): AsyncGenerator<string> {
+    const systemInstruction = getSystemInstruction(devices);
 
     try {
          switch (settings.provider) {
             case 'gemini':
-                yield* streamGeminiChat(fullHistory, settings);
+                yield* streamGeminiChat(history, settings, systemInstruction);
                 break;
             case 'openai':
             case 'iotteam':
             case 'anthropic':
-                 yield* streamOpenAICompatibleChat(fullHistory, settings);
+                 yield* streamOpenAICompatibleChat(history, settings, systemInstruction);
                 break;
             default:
                 yield "Error: Unsupported provider.";
@@ -149,9 +168,10 @@ export async function* streamChatResponse(history: ChatMessage[], message: strin
     }
 }
 
-async function* streamGeminiChat(history: ChatMessage[], settings: AISettings): AsyncGenerator<string> {
-    if (!settings.gemini.apiKey) throw new Error("Gemini API key is not set.");
-    const ai = new GoogleGenAI({ apiKey: settings.gemini.apiKey });
+async function* streamGeminiChat(history: ChatMessage[], settings: AISettings, systemInstruction: { role: string, parts: { text: string }[]}): AsyncGenerator<string> {
+    if (!settings.gemini.apiKey && !process.env.API_KEY) throw new Error("Gemini API key is not set.");
+    // Fix: Use process.env.API_KEY for Gemini initialization as per guidelines.
+    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || settings.gemini.apiKey });
 
     const contents = history.map(msg => ({
         role: msg.role,
@@ -171,14 +191,17 @@ async function* streamGeminiChat(history: ChatMessage[], settings: AISettings): 
     }
 }
 
-async function* streamOpenAICompatibleChat(history: ChatMessage[], settings: AISettings): AsyncGenerator<string> {
+async function* streamOpenAICompatibleChat(history: ChatMessage[], settings: AISettings, systemInstruction: { role: string, parts: { text: string }[]}): AsyncGenerator<string> {
      const provider = settings.provider;
     const providerSettings = settings[provider];
     if (!providerSettings.apiKey) throw new Error(`${provider} API key is not set.`);
+    if (provider !== 'anthropic' && !providerSettings.baseURL) {
+        throw new Error(`${provider} Base URL is not set in settings.`);
+    }
 
     const url = provider === 'anthropic'
         ? 'https://api.anthropic.com/v1/messages'
-        : `${providerSettings.baseURL}/chat/completions`;
+        : `${providerSettings.baseURL!.replace(/\/$/, '')}/chat/completions`;
 
     const headers: Record<string, string> = {
         'Content-Type': 'application/json',
@@ -188,6 +211,7 @@ async function* streamOpenAICompatibleChat(history: ChatMessage[], settings: AIS
         headers['x-api-key'] = providerSettings.apiKey;
         headers['anthropic-version'] = '2023-06-01';
     } else {
+        // This logic applies to both 'openai' and 'iotteam' providers
         headers['Authorization'] = `Bearer ${providerSettings.apiKey}`;
     }
 
@@ -198,11 +222,12 @@ async function* streamOpenAICompatibleChat(history: ChatMessage[], settings: AIS
 
     const body = provider === 'anthropic' ? {
         model: providerSettings.model,
-        max_tokens: 1024,
+        max_tokens: 2048,
         messages: messages,
         system: systemInstruction.parts[0].text,
         stream: true,
     } : {
+        // This is the request body for OpenAI-compatible APIs (OpenAI, IoTTeam)
         model: providerSettings.model,
         messages: [{ role: 'system', content: systemInstruction.parts[0].text }, ...messages],
         stream: true,
@@ -241,7 +266,7 @@ async function* streamOpenAICompatibleChat(history: ChatMessage[], settings: AIS
                     if (json.type === 'content_block_delta') {
                         textChunk = json.delta?.text;
                     }
-                } else { // OpenAI compatible
+                } else { // OpenAI compatible logic (for OpenAI, IoTTeam)
                     textChunk = json.choices?.[0]?.delta?.content;
                 }
 

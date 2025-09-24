@@ -21,6 +21,8 @@ const iconMap: Record<string, string> = {
     sun: 'fa-solid fa-sun',
     moon: 'fa-solid fa-moon',
     bell: 'fa-solid fa-bell',
+    history: 'fa-solid fa-clock-rotate-left',
+    sparkles: 'fa-solid fa-sparkles',
 };
 
 export const Icon: React.FC<IconProps> = ({ name, className = '' }) => {

@@ -1,4 +1,3 @@
-
 # Factory Insight AI - Bảng Điều Khiển Bảo Trì Dự Đoán
 
 <div align="center">

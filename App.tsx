@@ -10,9 +10,10 @@ import { DeviceManagementView } from './components/DeviceManagementView';
 import { ChatView } from './components/ChatView';
 import { SettingsView } from './components/SettingsView';
 import { NotificationsPanel } from './components/NotificationsPanel';
+import { HistoryView } from './components/HistoryView';
 import { connectToDevice, disconnectFromDevice, LiveConnection } from './services/connectionService';
 
-type View = 'dashboard' | 'protocols' | 'devices' | 'chat' | 'settings';
+type View = 'dashboard' | 'protocols' | 'devices' | 'settings' | 'history';
 type Mode = 'simulation' | 'live';
 export type ConversationState = 'idle' | 'listening' | 'processing' | 'speaking';
 type Theme = 'light' | 'dark';
@@ -74,10 +75,10 @@ const Sidebar: React.FC<{ currentView: View; setView: (view: View) => void }> = 
                     <Icon name="devices" className="w-6 text-center text-lg mr-3" />
                     <span className="font-medium">Devices</span>
                 </a>
-                <a onClick={() => setView('chat')} className={navItemClasses('chat')}>
-                     {currentView === 'chat' && <div className="absolute left-0 top-2 bottom-2 w-1 bg-blue-500 rounded-r-full"></div>}
-                    <Icon name="chat" className="w-6 text-center text-lg mr-3" />
-                    <span className="font-medium">AI Chat</span>
+                 <a onClick={() => setView('history')} className={navItemClasses('history')}>
+                    {currentView === 'history' && <div className="absolute left-0 top-2 bottom-2 w-1 bg-blue-500 rounded-r-full"></div>}
+                    <Icon name="history" className="w-6 text-center text-lg mr-3" />
+                    <span className="font-medium">History Explorer</span>
                 </a>
                  <a onClick={() => setView('settings')} className={navItemClasses('settings')}>
                      {currentView === 'settings' && <div className="absolute left-0 top-2 bottom-2 w-1 bg-blue-500 rounded-r-full"></div>}
@@ -213,8 +214,10 @@ const App: React.FC = () => {
     const [analyzingDeviceId, setAnalyzingDeviceId] = useState<string | null>(null);
     const [conversationState, setConversationState] = useState<ConversationState>('idle');
     const [notifications, setNotifications] = useState<Notification[]>([]);
+    const [isChatOpen, setIsChatOpen] = useState<boolean>(false);
     const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
     const [chatHistory, setChatHistory] = useState<ChatMessage[]>([]);
+    const [isContinuousMode, setIsContinuousMode] = useState<boolean>(false);
     const [aiSettings, setAiSettings] = useState<AISettings>(() => {
         try {
             const savedSettings = localStorage.getItem('aiSettings');
@@ -421,7 +424,11 @@ const App: React.FC = () => {
     
     const speakSentences = useCallback((sentences: string[]) => {
         if (sentences.length === 0) {
-            setConversationState('listening'); // Loop back to listening
+            if (isContinuousMode) {
+                setConversationState('listening');
+            } else {
+                setConversationState('idle');
+            }
             return;
         }
 
@@ -441,58 +448,99 @@ const App: React.FC = () => {
         
         utterance.onerror = (e) => {
             console.error("Speech synthesis error", e);
-            setConversationState('listening');
+             if (isContinuousMode) {
+                setConversationState('listening');
+            } else {
+                setConversationState('idle');
+            }
         };
 
         window.speechSynthesis.speak(utterance);
-    }, []);
+    }, [isContinuousMode]);
 
 
     const handleSendMessage = async (message: string) => {
-        if (conversationState === 'processing') return;
+        if (conversationState === 'processing' || !message.trim()) return;
+
+        if (window.speechSynthesis.speaking) {
+            window.speechSynthesis.cancel();
+            if (utteranceRef.current) utteranceRef.current.onend = null;
+        }
 
         setConversationState('processing');
-        setChatHistory(prev => [...prev, { role: 'user', parts: [{ text: message }] }]);
+        const userMessage: ChatMessage = { role: 'user', parts: [{ text: message }] };
+        const currentHistory = [...chatHistory, userMessage];
+        setChatHistory(currentHistory);
+
+        // Add a placeholder for the model's response
+        setChatHistory(prev => [...prev, { role: 'model', parts: [{ text: '' }] }]);
 
         try {
-            const stream = streamChatResponse(chatHistory, message, aiSettings);
+            const stream = streamChatResponse(currentHistory, aiSettings, devices);
             let accumulatedText = "";
-            const sentences: string[] = [];
-            let fullResponse = "";
+            let sentenceBuffer = ""; // Use a separate buffer for sentence parsing
 
             for await (const chunk of stream) {
                 accumulatedText += chunk;
-                fullResponse += chunk;
-                const parts = accumulatedText.split(/(?<=[.?!])\s+/);
+                sentenceBuffer += chunk;
+                
+                // Update the last message in chat history with the streamed content
+                setChatHistory(prev => {
+                    const newHistory = [...prev];
+                    newHistory[newHistory.length - 1].parts[0].text = accumulatedText;
+                    return newHistory;
+                });
+                
+                const parts = sentenceBuffer.split(/(?<=[.?!])\s+/);
                 if (parts.length > 1) {
                     const completeSentences = parts.slice(0, -1);
-                    sentences.push(...completeSentences);
-                    speakSentences(completeSentences); // Start speaking as sentences complete
-                    accumulatedText = parts[parts.length - 1];
+                    speakSentences(completeSentences);
+                    sentenceBuffer = parts.pop() || ''; // Keep only the last, incomplete part
                 }
             }
             
-            if (accumulatedText.trim()) {
-                sentences.push(accumulatedText.trim());
-                 speakSentences([accumulatedText.trim()]);
+            if (sentenceBuffer.trim()) {
+                 speakSentences([sentenceBuffer.trim()]);
+            } else if (!window.speechSynthesis.speaking) {
+                // If the response was empty and nothing is speaking, go to next state.
+                 if (isContinuousMode) {
+                    setConversationState('listening');
+                } else {
+                    setConversationState('idle');
+                }
             }
-            
-            setChatHistory(prev => [...prev, { role: 'model', parts: [{ text: fullResponse }] }]);
 
         } catch (error) {
             console.error("Error sending chat message:", error);
             const errorMessage = `Sorry, I encountered an error. Please check the AI provider settings.`;
+            // Update the placeholder with the error message
+            setChatHistory(prev => {
+                const newHistory = [...prev];
+                newHistory[newHistory.length - 1].parts[0].text = errorMessage;
+                return newHistory;
+            });
             speakSentences([errorMessage]);
-            setChatHistory(prev => [...prev, { role: 'model', parts: [{ text: errorMessage }] }]);
         }
     };
     
-    const handleInterrupt = () => {
-        if (utteranceRef.current) {
-            utteranceRef.current.onend = null;
-        }
-        window.speechSynthesis.cancel();
-        setConversationState('listening');
+    const handleToggleContinuousMode = () => {
+        setIsContinuousMode(prev => {
+            const nextMode = !prev;
+            if (nextMode) {
+                // Starting continuous mode
+                setConversationState('listening');
+            } else {
+                // Stopping continuous mode
+                if (window.speechSynthesis.speaking) {
+                    window.speechSynthesis.cancel();
+                }
+                if (utteranceRef.current) {
+                    utteranceRef.current.onend = null;
+                }
+                setConversationState('idle');
+            }
+            return nextMode;
+        });
     };
     
     const handleSimulateNotification = (level: 'Warning' | 'Critical') => {
@@ -511,15 +559,20 @@ const App: React.FC = () => {
     };
 
     useEffect(() => {
-        return () => {
-            if (window.speechSynthesis) {
+        // Stop speech synthesis and continuous mode if chat is closed
+        if (!isChatOpen) {
+             if (window.speechSynthesis && window.speechSynthesis.speaking) {
                 if (utteranceRef.current) {
                     utteranceRef.current.onend = null;
                 }
                 window.speechSynthesis.cancel();
             }
+            if (isContinuousMode) {
+                setIsContinuousMode(false);
+            }
+            setConversationState('idle');
         }
-    }, [view]);
+    }, [isChatOpen]);
 
     const closeModal = () => {
         setModalOpen(false);
@@ -532,7 +585,7 @@ const App: React.FC = () => {
             <Header theme={theme} toggleTheme={toggleTheme} notifications={notifications} onNotificationsToggle={handleNotificationsToggle} />
             <div className="flex flex-1 overflow-hidden relative">
                 <Sidebar currentView={view} setView={setView} />
-                <main className="flex-1 overflow-y-auto flex flex-col">
+                <main className="flex-1 flex flex-col overflow-y-auto">
                     {view === 'dashboard' && <DashboardView devices={devices} handleAnalyzeDevice={handleAnalyzeDevice} analyzingDeviceId={analyzingDeviceId} mode={mode} onModeChange={setMode} />}
                     {view === 'protocols' && <ProtocolsView protocols={protocols} onAddProtocol={handleAddProtocol} />}
                     {view === 'devices' &&
@@ -543,15 +596,7 @@ const App: React.FC = () => {
                             onUpdateDevice={handleUpdateDevice}
                             onDeleteDevice={handleDeleteDevice}
                         />}
-                    {view === 'chat' &&
-                        <ChatView
-                            conversationState={conversationState}
-                            setConversationState={setConversationState}
-                            onSendMessage={handleSendMessage}
-                            onInterrupt={handleInterrupt}
-                            theme={theme}
-                        />
-                    }
+                     {view === 'history' && <HistoryView devices={devices} />}
                     {view === 'settings' && 
                         <SettingsView 
                             settings={aiSettings}
@@ -573,6 +618,32 @@ const App: React.FC = () => {
                 deviceName={selectedDevice?.name || ''}
                 isLoading={isLoadingAnalysis}
             />
+            
+            {/* Chat Widget & Bubble */}
+            {!isChatOpen && (
+                <button
+                    onClick={() => setIsChatOpen(true)}
+                    className="fixed bottom-6 right-6 bg-blue-600 text-white w-16 h-16 rounded-full flex items-center justify-center shadow-2xl z-50 hover:bg-blue-700 transition-transform transform hover:scale-110 animate-fade-in-up"
+                    aria-label="Open AI Chat"
+                >
+                    <Icon name="chat" className="text-2xl" />
+                </button>
+            )}
+
+            {isChatOpen && (
+                <div className="fixed bottom-6 right-6 w-full max-w-md h-[70vh] max-h-[600px] z-50">
+                    <ChatView
+                        chatHistory={chatHistory}
+                        conversationState={conversationState}
+                        setConversationState={setConversationState}
+                        onSendMessage={handleSendMessage}
+                        isContinuousMode={isContinuousMode}
+                        onToggleContinuousMode={handleToggleContinuousMode}
+                        theme={theme}
+                        onClose={() => setIsChatOpen(false)}
+                    />
+                </div>
+            )}
         </div>
     );
 };
