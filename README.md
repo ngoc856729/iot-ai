@@ -188,6 +188,14 @@ app.on('window-all-closed', () => {
     app.quit();
   }
 });
+
+app.on('activate', () => {
+  // Trên macOS, thông thường sẽ tạo lại một cửa sổ trong ứng dụng khi
+  // biểu tượng dock được nhấp và không có cửa sổ nào khác đang mở.
+  if (BrowserWindow.getAllWindows().length === 0) {
+    createWindow();
+  }
+});
 ```
 </details>
 
